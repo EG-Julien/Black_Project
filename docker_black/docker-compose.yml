@@ -1,0 +1,42 @@
+version: '2'
+
+services:
+    db:
+        image: mysql:latest
+        container_name: Black-mysql-local
+        volumes:
+            - "./mysql/data/db:/var/db/mysql"
+            - "./mysql/config:/etc/mysql"
+        environment:
+            MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+            MYSQL_DATABASE: ${MYSQL_DATABASE}
+            MYSQL_USER: ${MYSQL_USER}
+            MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+        restart: "always"
+    php:
+        build:
+            context: php7-slim
+            args:
+                TIMEZONE: ${TIMEZONE}
+        container_name: Black-app-local
+        volumes:
+            - ${APP_PATH}:/var/www
+        restart: "always"
+    nginx:
+        build: nginx
+        container_name: Black-nginx-local
+        ports:
+            - 80:80
+        volumes_from:
+            - php
+        volumes:
+            - ./logs/nginx/:/var/log/nginx
+        restart: "always"
+    phpmyadmin:
+        image: phpmyadmin/phpmyadmin
+        container_name: Black-phpmyadmin-local
+        depends_on:
+            - db
+        ports:
+            - "8080:80"
+        restart: "always"

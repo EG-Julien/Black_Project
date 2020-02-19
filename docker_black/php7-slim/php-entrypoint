@@ -1,0 +1,10 @@
+#!/bin/bash
+set -ex
+
+echo 'BAE php-entrypoint start'
+
+cd /var/www/
+
+composer update && composer install
+
+echo 'BAE php-entrypoint end'
