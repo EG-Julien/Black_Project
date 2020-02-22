@@ -41,7 +41,7 @@ void setup() {
 
     Serial.println();
 
-    server.on("/setData", handleNewGetRequest);  // setData?deviceID=$ID&command=$cmd
+    server.on("/set", handleNewGetRequest);  // setData?deviceID=$ID&command=$cmd
     server.onNotFound ( handleNotFound );
 	server.begin();
 
@@ -56,11 +56,15 @@ void loop() {
 void handleNewGetRequest() {
 
     String power = "-1";
+    String deviceID = "";
 
     if (server.args() > 0 && server.uri() == "/set") { // 
 
         if (server.argName(0) == "power") {
             deviceID = server.arg(0);
+            powerManager(server.arg(0).toInt());
+            Serial.println(deviceID);
+            Serial.println(server.arg(0));
         }
 
         if (deviceID == "-1") {
