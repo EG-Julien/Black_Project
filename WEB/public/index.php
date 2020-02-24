@@ -40,7 +40,7 @@ $app->get('/set/{room}/{stuff}/{state}', function ($request, $response, $args) {
             $state = 100;
         if ($state == "off")
             $state = 0;
-        $url = "192.168.33.157/set?power=$state";
+        $url = "http://192.168.33.157/set?power=$state";
         return $response->write(file_get_contents($url));
     }
 });
