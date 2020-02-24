@@ -8,6 +8,14 @@
             ],
             "forcedInclude": [],
             "intelliSenseMode": "msvc-x64"
+        },
+        {
+            "name": "Mac",
+            "includePath": [
+                "/Users/eg_julien/Library/Arduino15/packages/esp8266/tools/**",
+                "/Users/eg_julien/Library/Arduino15/packages/esp8266/hardware/esp8266/2.5.2/**"
+            ],
+            "forcedInclude": []
         }
     ],
     "version": 4
