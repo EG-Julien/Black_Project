@@ -29,15 +29,13 @@ require '../app/container.php';
 **/
 
 $app->get('/', \App\Controllers\HomeCtrl::class . ':Home');
-$app->get('/set/:room/:stuff/:state', function ($room, $stuff, $state) {
-    if ($room == "salon" && $stuff == "table") {
-        if ($state == "on")
-            $state = 100;
-        if ($state == "off")
-            $state = 0;
-        $url = "192.168.33.157/set?power=$state";
-        echo file_get_contents($url);
-    }
+$app->get('/set/salon/table/:state', function ($state) {
+    if ($state == "on")
+        $state = 100;
+    if ($state == "off")
+        $state = 0;
+    $url = "192.168.33.157/set?power=$state";
+    echo file_get_contents($url);
 });
 
 $app->run();
