@@ -9,11 +9,14 @@
 #define END_CHAR '/'
 #define ID 2
 
-#define LED_STRIP 2
+#define __SET 0
+#define __GET 1
 
-String SERVER = "192.168.33.1"; // To complete by real address
+uint8_t LED_STRIP = 4;
 
-int __current_brightness = 0;
+String SERVER = "192.168.33.246"; // To complete by real address
+
+int __current_brightness = 1023;
 
 const char *ssid = "Appartouze_City_Gang";
 const char *password = "Cafsouris220";
@@ -31,7 +34,11 @@ void setup() {
     WiFi.begin(ssid, password);
 
     pinMode(LED_BUILTIN, OUTPUT);
+    pinMode(LED_STRIP, OUTPUT);
+    digitalWrite(LED_STRIP, HIGH);
     digitalWrite(LED_BUILTIN, LOW);
+
+    delay(5000);
 
     while(WiFi.status() != WL_CONNECTED){
         delay(500);
@@ -42,6 +49,7 @@ void setup() {
     Serial.println();
 
     server.on("/set", handleNewGetRequest);  // setData?deviceID=$ID&command=$cmd
+    server.on("/get", handleNewGetRequest);  // setData?deviceID=$ID&command=$cmd
     server.onNotFound ( handleNotFound );
 	server.begin();
 
@@ -63,8 +71,6 @@ void handleNewGetRequest() {
         if (server.argName(0) == "power") {
             deviceID = server.arg(0);
             powerManager(server.arg(0).toInt());
-            Serial.println(deviceID);
-            Serial.println(server.arg(0));
         }
 
         if (deviceID == "-1") {
@@ -73,8 +79,10 @@ void handleNewGetRequest() {
 
         Serial.println();
 
-        handleRoot();
+        handleRoot(__SET);
         
+    } else if (server.uri() == "/get") {
+        handleRoot(__GET);
     } else {
         handleNotFound();
     }
@@ -95,15 +103,25 @@ void handleNotFound() {
 	}
 
     if (DEBUG) {
-        server.send ( 404, "text/plain", message );
+        server.send (404, "text/plain", message );
     } else {
         server.send(404, "text/plain", "{\"message\" : \"request_aborted\"}");
     }
 }
 
-void handleRoot() {
-    server.send(200, "text/html", "{\"message\" : \"request_success\"}");
-    return;
+void handleRoot(int __params) {
+    if (__params == __SET) {
+        server.send(200, "text/html", "{\"message\" : \"request_success\"}");
+    } else if (__params == __GET) {
+        String message = "{\"message\" : \"request_success\",";
+        message += "\"brightness\" : ";
+        message += __current_brightness;
+        message += "}";
+        server.send(200, "text/html", message);
+    } else {
+        handleNotFound();
+    }
+    
 }
 
 void executeCommand(String command) {
@@ -162,24 +180,28 @@ void sendData(String ip, String url) {
 
 void powerManager(int brightness) {
 
-    if (brightness == -1) {
-        __current_brightness = 0;
-        analogWrite(LED_STRIP, 0);
-        digitalWrite(LED_STRIP, LOW);
-        return;
-    }
+    if (brightness > 100)
+        brightness = 100;
 
     if (__current_brightness < brightness) {
         for (int i = __current_brightness; i < brightness; i++) {
-            analogWrite(LED_STRIP, i);
-            delay(10);
+            analogWrite(LED_STRIP, map(i, 0, 100, 0, 1023));
+            delay(1);
         }
     } else {
         for (int i = __current_brightness; i > brightness; i--) {
-            analogWrite(LED_STRIP, i);
-            delay(10);
+            analogWrite(LED_STRIP, map(i, 0, 100, 0, 1023));
+            delay(1);
         }
     }
+
+    if (brightness == 0) 
+        digitalWrite(LED_STRIP, LOW);
+
+    if (brightness == 100)
+        digitalWrite(LED_STRIP, HIGH);
+
+    __current_brightness = brightness;
 
     return;
 }
