@@ -29,6 +29,9 @@ require '/home/pi/Automation/Black_Project/WEB/app/container.php';
 **/
 
 $app->get('/', \App\Controllers\HomeCtrl::class . ':Home');
+$app->get('/startComputer', function ($request, $response, $args) { 
+    shell_exec('sudo etherwake D8:CB:8A:9B:BC:0C');             
+});                                                                 
 $app->get('/set/{room}/{stuff}/{state}', function ($request, $response, $args) {
 
     $room  = $args['room'];
