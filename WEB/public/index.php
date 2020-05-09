@@ -45,4 +45,38 @@ $app->get('/set/{room}/{stuff}/{state}', function ($request, $response, $args) {
     }
 });
 
+$app->get('/set/{room}/{stuff}/{params}/{value}', function ($request, $response, $args) {
+
+    $room   = $args['room'];
+    $stuff  = $args['stuff'];
+    $params = $args['params'];
+    $value  = $args['value'];
+
+    if ($room == "chambre" && $stuff == "lit") {
+        
+        if ($params == "power") {
+
+            if ($value == "on")
+                $value = 100;
+            if ($value == "off")
+                $value = 0;
+
+            $url = "http://192.168.33.14/set?power=$value";
+            return $response->write(file_get_contents($url));
+        }
+
+        if ($params == "state") {
+            list($r, $g, $b) = sscanf($value, "%02x%02x%02x");
+            $url = "http://192.168.33.14/set?r=$r&g=$g&b=$b";
+            return $response->write(file_get_contents($url));
+        }
+
+        if ($params == "colors") {
+
+        }
+
+        
+    }
+});
+
 $app->run();
