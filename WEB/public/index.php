@@ -69,7 +69,7 @@ $app->get('/set/{room}/{stuff}/{params}/{value}', function ($request, $response,
         }
 
         if ($params == "state") {
-            $url = "http://192.168.33.14/set?power=$value";
+            $url = "http://192.168.33.14/set?state=$value";
             return $response->write(file_get_contents($url));
         }
 
