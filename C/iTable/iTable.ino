@@ -82,7 +82,19 @@ void handleNewGetRequest() {
         handleRoot(__SET);
         
     } else if (server.uri() == "/get") {
-        handleRoot(__GET);
+        if (server.argName(0) == "state") {
+            if (__current_brightness > 0) {
+                server.send(200, "text/plain", "1");
+            } else {
+                server.send(200, "text/plain", "0");
+            }
+        }
+
+        if (server.argName(0) == "brightness") {
+            char str[8];
+            itoa( __current_brightness, str, 10 );
+            server.send(200, "text/plain", str);
+        }
     } else {
         handleNotFound();
     }
