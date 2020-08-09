@@ -4,6 +4,8 @@
 #include <ESP8266HTTPClient.h>
 #include <String.h>
 #include <stdio.h>
+#include <IRremoteESP8266.h>
+#include <IRsend.h>
 
 #define DEBUG 1
 #define END_CHAR '/'
@@ -12,7 +14,11 @@
 #define __SET 0
 #define __GET 1
 
+#define ON 1
+#define OFF 0
+
 uint8_t LED_STRIP = 4;
+uint8_t IRLed = D5;
 
 String SERVER = "192.168.33.246"; // To complete by real address
 
@@ -23,6 +29,7 @@ const char *password = "Cafsouris220";
 
 ESP8266WebServer server(80);
 HTTPClient http;
+IRsend irsend(IRLed);
 
 void setup() {
 
@@ -35,6 +42,7 @@ void setup() {
 
     pinMode(LED_BUILTIN, OUTPUT);
     pinMode(LED_STRIP, OUTPUT);
+    pinMode(IRLed, OUTPUT);
     digitalWrite(LED_STRIP, HIGH);
     digitalWrite(LED_BUILTIN, LOW);
 
@@ -71,6 +79,17 @@ void handleNewGetRequest() {
         if (server.argName(0) == "power") {
             deviceID = server.arg(0);
             powerManager(server.arg(0).toInt());
+        }
+
+        if (server.argName(0) == "video") {
+            deviceID = server.arg(0);
+            if (deviceID.toInt() == ON) {
+                video(ON);
+                Serial.println("VIDEO ON");
+            } else if (deviceID.toInt() == OFF) {
+                video(OFF);
+                Serial.println("VIDEO OFF");
+            }
         }
 
         if (deviceID == "-1") {
@@ -216,4 +235,14 @@ void powerManager(int brightness) {
     __current_brightness = brightness;
 
     return;
+}
+
+void video(int __state) {
+    if (__state == OFF) {
+        irsend.sendNEC(0x00C03FB847);
+        delay(200);
+        irsend.sendNEC(0x00C03FB847);
+    } else if (__state == ON) {
+        irsend.sendNEC(0x00C03FB847);
+    }
 }

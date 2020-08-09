@@ -31,7 +31,17 @@ require '/home/pi/Automation/Black_Project/WEB/app/container.php';
 $app->get('/', \App\Controllers\HomeCtrl::class . ':Home');
 $app->get('/startComputer', function ($request, $response, $args) { 
     shell_exec('sudo etherwake D8:CB:8A:9B:BC:0C');             
-});                                                                 
+});   
+
+$app->get('/video/{state}', function ($request, $response, $args) {
+    $state = $args['state'];
+
+    if ($state == 1)
+        return $response->write(file_get_contents("http://192.168.33.157/set?video=1"));
+    if ($state == 0)
+        return $response->write(file_get_contents("http://192.168.33.157/set?video=0"));
+});
+
 $app->get('/set/{room}/{stuff}/{state}', function ($request, $response, $args) {
 
     $room  = $args['room'];
